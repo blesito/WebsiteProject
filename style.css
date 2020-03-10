@@ -73,6 +73,10 @@ body {
     height: 100vh;
   }
 
+  .login {
+    margin-top: 100px;
+  }
+
   .login
   input[type=text] {
     width: 100%;
@@ -159,4 +163,12 @@ body {
     color: white;
   }
 
-
+  footer {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 1rem;
+    color: #efefef;
+    text-align: center;
+  }

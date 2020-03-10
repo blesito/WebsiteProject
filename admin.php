@@ -12,10 +12,11 @@
             <div class="sidenav">
                 <a href="cases.php">Cases</a>
                 <a href="files.php">Files</a>
-                <a href="login.php">Logout</a>
+                <a href="loginIndex.php">Logout</a>
             </div>
 
       
 
     </body>
 </html>
+

@@ -1,76 +1,47 @@
-<!DOCTYPE html>
-<html>
-    <link rel="stylesheet" href="style.css">
-    <body>
-        <div class="page1">
-            <div class="login1"> 
-                <h1>Sign In</h1>
-                <form class="login" action="admin.php " method="post">
-                    <input type="text" placeholder="Username" name="user" required/>
-                    <input type="password" placeholder="Password" name="pass" required/>
-                    <input type="submit" name="submit" value="Login" />
-                </form>
-            </div>
-        </div>
-    </body>
-</html>
-
-<?php
-session_start();
-$_SESSION['message'] = 'Welcome!';
-// Change this to your connection info.
-$DATABASE_HOST = 'localhost';
-$DATABASE_USER = 'root';
-$DATABASE_PASS = '';
-$DATABASE_NAME = 'law';
-// Try and connect using the info above.
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $con = mysqli_connect($DATABASE_HOST, $DATABASE_USER, $DATABASE_PASS, $DATABASE_NAME);
-    if (mysqli_connect_errno()) {
-        // If there is an error with the connection, stop the script and display the error.
-        // die ('Failed to connect to MySQL: ' . mysqli_connect_error());
-        $_SESSION['message'] =('Failed to connect to MySQL: ' . mysqli_connect_error());
-    }
-    // Now we check if the data from the login form was submitted, isset() will check if the data exists.
-
-    // if ( !isset($_POST['username'], $_POST['password']) ) {
-    // 	// Could not get the data that should have been sent.
-    // 	// die ('Please fill both the username and password field!');
-    // 	$_SESSION['message'] = "Please fill both the username and password field!";
-    // }
-
-    // Prepare our SQL, preparing the SQL statement will prevent SQL injection.
-    if ($stmt = $con->prepare('SELECT id, password FROM login WHERE username = ?')) {
-        // Bind parameters (s = string, i = int, b = blob, etc), in our case the username is a string so we use "s"
-        $stmt->bind_param('s', $_POST['user']);
-        $stmt->execute();
-        // Store the result so we can check if the account exists in the database.
-        $stmt->store_result();
-    
-        if ($stmt->num_rows > 0) {
-            $stmt->bind_result($id, $password);
-            $stmt->fetch();
-            // Account exists, now we verify the password.
-            // Note: remember to use password_hash in your registration file to store the hashed passwords.
-            if (password_verify($_POST['pass'], $password)) {
-                // Verification success! User has loggedin!
-                // Create sessions so we know the user is logged in, they basically act like cookies but remember the data on the server.
-                session_regenerate_id();
-                $_SESSION['loggedin'] = true;
-                $_SESSION['name'] = $_POST['user'];
-                $_SESSION['id'] = $id;
-                header('Location: \MyProjects\ARCprojects\ARRC_LAFS\admin_page.php');
-            } else {
-                // echo 'Incorrect password!';
-                $_SESSION['message'] = "Incorrect Password";
-            }
-        } else {
-            // echo 'Incorrect username!';
-            $_SESSION['message'] = "Incorrect Username";
-        }
-
-        $stmt->close();
-    }
+<?php 
+    //error_reporting(E_ERROR | E_PARSE | E_NOTICE);
+if(isset($_POST["submit"])){
+    include("serverconfig.php");
+	$connection = mysqli_connect($servername, $username, $password, $dbname);
+	if(mysqli_connect_errno()){
+	die("Connection to Database failed:" .mysqli_connect_error()." (".mysqli_connect_errno().")");}
+	if(isset($_POST["username"])){
+		$username=$_POST["username"];
+	}else{
+		$username="";
+	}
+	if(isset($_POST["password"])){
+		$password=$_POST["password"];
+	}else{
+		$password="";
+	}
+	$query1="select * from login where username='$username' and passcode='$password'";
+	$result1 = mysqli_query($connection,$query1);
+	$number_of_rows1 = mysqli_num_rows($result1);
+	//$query2="select * from superusers where username='$username' and password='$password'";
+	//$result2 = mysqli_query($connection,$query2);
+	//$number_of_rows2 = mysqli_num_rows($result2);
+	if($number_of_rows1>0){
+		session_start();
+		$_SESSION['username']=strtolower($username);
+		//$row = mysqli_fetch_assoc($result1);
+		//$_SESSION['name']=$row['name'];
+		echo"<script>alert('success');";
+		header("Location: admin.php");
+	}/*else if($number_of_rows2>0){
+		session_start();
+		$_SESSION['username']=$username;
+		echo"<script>alert('success');";
+		header("Location: fts_admin\home_page.php");
+	}*/
+	else{// session_start();
+		echo"<script>alert('Wrong username/password combination');
+					 window.location='loginIndex.php';</script>";
+	}
+}else{
+	die('sorry, there was a problem connecting to database, Pleasse try again!');
 }
 ?>
+
+
 
